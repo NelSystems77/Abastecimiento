@@ -1,0 +1,192 @@
+/* Estilos Generales */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f7f6;
+    color: #333;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Sección de Búsqueda */
+.search-container {
+    position: relative;
+    margin-bottom: 30px;
+}
+
+#searchInput {
+    width: 100%;
+    padding: 12px 15px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; /* Importante para el padding */
+}
+
+.results-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    max-height: 250px;
+    overflow-y: auto;
+    z-index: 10;
+    display: none; /* Oculto por defecto */
+}
+
+.results-list .result-item {
+    padding: 10px 15px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+}
+
+.results-list .result-item:last-child {
+    border-bottom: none;
+}
+
+.results-list .result-item:hover {
+    background-color: #f1f1f1;
+}
+
+/* Sección de Productos Seleccionados */
+.selected-container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.selected-container h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.table-responsive {
+    overflow-x: auto;
+    margin-bottom: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 500px; /* Ancho mínimo para que se vea bien en móviles */
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 12px 8px;
+    text-align: left;
+    font-size: 14px;
+}
+
+th {
+    background-color: #f2f2f2;
+    color: #555;
+    font-weight: bold;
+}
+
+/* Columnas de cantidad editables */
+.editable {
+    background-color: #fdfdfd;
+}
+
+.input-cell {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.btn-remove {
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.btn-remove:hover {
+    background-color: #e60000;
+}
+
+.no-results {
+    text-align: center;
+    color: #777;
+    font-style: italic;
+    margin: 20px 0;
+}
+
+/* Botón Generar PDF */
+.btn-primary {
+    display: block;
+    width: 200px;
+    margin: 0 auto;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    font-size: 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.btn-primary:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.btn-primary:not(:disabled):hover {
+    background-color: #45a049;
+}
+
+/* Media Query para pantallas pequeñas */
+@media screen and (max-width: 600px) {
+    .container {
+        padding: 10px;
+    }
+
+    #searchInput {
+        font-size: 14px;
+        padding: 10px 12px;
+    }
+
+    th, td {
+        font-size: 12px;
+        padding: 8px 5px;
+    }
+
+    .input-cell {
+        font-size: 12px;
+        padding: 6px;
+    }
+
+    .btn-remove {
+        padding: 6px 10px;
+        font-size: 11px;
+    }
+
+    .btn-primary {
+        width: 100%; /* Botón ancho completo en móvil */
+    }
+}
