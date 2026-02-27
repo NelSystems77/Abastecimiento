@@ -358,8 +358,8 @@ if (generatePDFBtn) {
         const headers = [['Producto', 'Cantidad Solicitada', 'Cantidad Recibida']];
         const data = selectedProducts.map(p => [
             p.nombre,
-            p.solicitada || '', // Espacio en blanco si no hay cantidad
-            p.recibida || ''    // Espacio en blanco si no hay cantidad
+            p.solicitada || ' ', 
+            p.recibida || ' '    
         ]);
 
         doc.autoTable({
