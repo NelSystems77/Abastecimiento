@@ -252,6 +252,7 @@ const searchInput = document.getElementById('searchInput');
 const productResults = document.getElementById('productResults');
 const selectedTableBody = document.getElementById('selectedTableBody');
 const noSelectedMessage = document.getElementById('noSelectedMessage');
+const generatePDFBtn = document.getElementById('generatePDF');
 const btnAddNew = document.getElementById('btnAddNew');
 
 // Función para añadir un producto manual
