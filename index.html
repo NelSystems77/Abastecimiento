@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selector de Productos y Generador de PDF</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Selector de Productos</h1>
+    </header>
+
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Buscar producto por nombre...">
+        <div id="productResults" class="results-list"></div>
+    </div>
+
+    <div class="selected-container">
+        <h2>Productos Seleccionados</h2>
+        <div class="table-responsive">
+            <table id="selectedTable">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cantidad Solicitada</th>
+                        <th>Cantidad Recibida</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody id="selectedTableBody">
+                    </tbody>
+            </table>
+        </div>
+        <div id="noSelectedMessage" class="no-results">No hay productos seleccionados.</div>
+        <button id="generatePDF" class="btn-primary" disabled>Generar PDF (A4)</button>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+
+<script src="script.js"></script>
+</body>
+</html>
