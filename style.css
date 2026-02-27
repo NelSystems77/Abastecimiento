@@ -159,6 +159,21 @@ th {
 .btn-primary:not(:disabled):hover {
     background-color: #45a049;
 }
+/* Botón para añadir producto nuevo */
+.btn-secondary {
+    background-color: #008CBA;
+    color: white;
+    border: none;
+    padding: 0 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.btn-secondary:hover {
+    background-color: #007399;
+}
 
 /* Media Query para pantallas pequeñas */
 @media screen and (max-width: 600px) {
