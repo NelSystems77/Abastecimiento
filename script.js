@@ -252,7 +252,28 @@ const searchInput = document.getElementById('searchInput');
 const productResults = document.getElementById('productResults');
 const selectedTableBody = document.getElementById('selectedTableBody');
 const noSelectedMessage = document.getElementById('noSelectedMessage');
-const generatePDFBtn = document.getElementById('generatePDF');
+const btnAddNew = document.getElementById('btnAddNew');
+
+// Función para añadir un producto manual
+btnAddNew.addEventListener('click', () => {
+    // Tomamos lo que el usuario haya escrito en el buscador como sugerencia
+    const sugerencia = searchInput.value.trim();
+    const nuevoNombre = prompt("Ingrese el nombre del nuevo producto:", sugerencia);
+    
+    if (nuevoNombre && nuevoNombre.trim() !== "") {
+        const nuevoProducto = {
+            // Generamos un código temporal único usando la fecha
+            codigo: `MANUAL-${Date.now()}`, 
+            nombre: nuevoNombre.trim().toUpperCase()
+        };
+        
+        // Lo añadimos a la base de datos actual para que se pueda buscar luego
+        productsData.push(nuevoProducto);
+        
+        // Y lo agregamos directamente a la tabla de seleccionados
+        addProduct(nuevoProducto);
+    }
+});
 
 // --- INICIALIZACIÓN ---
 document.addEventListener('DOMContentLoaded', () => {
@@ -381,8 +402,8 @@ generatePDFBtn.addEventListener('click', () => {
     const headers = [['Producto', 'Cantidad Solicitada', 'Cantidad Recibida']];
     const data = selectedProducts.map(p => [
         p.nombre,
-        p.solicitada || '0', // Valor por defecto si está vacío
-        p.recibida || '0'    // Valor por defecto si está vacío
+        p.solicitada || '__', // Valor por defecto si está vacío
+        p.recibida || '__'    // Valor por defecto si está vacío
     ]);
 
     doc.autoTable({
