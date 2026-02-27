@@ -1,7 +1,7 @@
-// Asegurar que jsPDF esté disponible (umd build)
+// 1. INICIALIZACIÓN DE LIBRERÍAS
 const { jsPDF } = window.jspdf;
 
-// --- DATOS JSON ---
+// 2. TUS DATOS JSON (Mantengo los productos que subiste)
 const productsData = [
     { "codigo": "1-10-16-0010", "nombre": "CN PARACETAMOL 500 MG, TABLETA" },
     { "codigo": "1-10-09-0020", "nombre": "CN ACETAZOLAMIDA 250 MG. TABLETAS" },
@@ -244,10 +244,10 @@ const productsData = [
     { "codigo": "1-10-42-4670", "nombre": "FC VITAMINA B-1 (TIAMINA CLORHIDRATO) 100 MG/ML" }
 ];
 
-// Variables globales para la gestión
+// 3. VARIABLES DE ESTADO
 let selectedProducts = [];
 
-// Elementos del DOM
+// 4. ELEMENTOS DEL DOM (Definidos al inicio para evitar ReferenceError)
 const searchInput = document.getElementById('searchInput');
 const productResults = document.getElementById('productResults');
 const selectedTableBody = document.getElementById('selectedTableBody');
@@ -255,100 +255,15 @@ const noSelectedMessage = document.getElementById('noSelectedMessage');
 const generatePDFBtn = document.getElementById('generatePDF');
 const btnAddNew = document.getElementById('btnAddNew');
 
-// Función para añadir un producto manual
-btnAddNew.addEventListener('click', () => {
-    // Tomamos lo que el usuario haya escrito en el buscador como sugerencia
-    const sugerencia = searchInput.value.trim();
-    const nuevoNombre = prompt("Ingrese el nombre del nuevo producto:", sugerencia);
-    
-    if (nuevoNombre && nuevoNombre.trim() !== "") {
-        const nuevoProducto = {
-            // Generamos un código temporal único usando la fecha
-            codigo: `MANUAL-${Date.now()}`, 
-            nombre: nuevoNombre.trim().toUpperCase()
-        };
-        
-        // Lo añadimos a la base de datos actual para que se pueda buscar luego
-        productsData.push(nuevoProducto);
-        
-        // Y lo agregamos directamente a la tabla de seleccionados
-        addProduct(nuevoProducto);
-    }
-});
-
-// --- INICIALIZACIÓN ---
-document.addEventListener('DOMContentLoaded', () => {
-    updateTableState();
-});
-
-// --- FUNCIONES DE BÚSQUEDA ---
-searchInput.addEventListener('input', (e) => {
-    const searchTerm = e.target.value.toLowerCase().trim();
-    if (searchTerm.length < 2) {
-        productResults.style.display = 'none';
-        return;
-    }
-
-    const filtered = productsData.filter(p => p.nombre.toLowerCase().includes(searchTerm));
-    showResults(filtered);
-});
-
-function showResults(results) {
-    productResults.innerHTML = '';
-    if (results.length === 0) {
-        const div = document.createElement('div');
-        div.className = 'result-item';
-        div.textContent = 'No se encontraron productos.';
-        div.style.cursor = 'default';
-        productResults.appendChild(div);
+// 5. FUNCIONES DE LÓGICA
+function updateTableState() {
+    if (selectedProducts.length > 0) {
+        noSelectedMessage.style.display = 'none';
+        if (generatePDFBtn) generatePDFBtn.disabled = false;
     } else {
-        results.forEach(product => {
-            const div = document.createElement('div');
-            div.className = 'result-item';
-            div.textContent = product.nombre;
-            div.onclick = () => addProduct(product);
-            productResults.appendChild(div);
-        });
+        noSelectedMessage.style.display = 'block';
+        if (generatePDFBtn) generatePDFBtn.disabled = true;
     }
-    productResults.style.display = 'block';
-}
-
-// Cerrar resultados si se hace clic fuera
-document.addEventListener('click', (e) => {
-    if (!e.target.closest('.search-container')) {
-        productResults.style.display = 'none';
-    }
-});
-
-// --- FUNCIONES DE GESTIÓN DE SELECCIÓN ---
-function addProduct(product) {
-    // Comprobar si ya está seleccionado
-    if (selectedProducts.some(p => p.codigo === product.codigo)) {
-        alert('Este producto ya está seleccionado.');
-        productResults.style.display = 'none';
-        searchInput.value = '';
-        return;
-    }
-
-    const newProduct = {
-        ...product,
-        solicitada: '',
-        recibida: ''
-    };
-    selectedProducts.push(newProduct);
-    renderSelectedRow(newProduct);
-    updateTableState();
-
-    // Limpiar búsqueda
-    productResults.style.display = 'none';
-    searchInput.value = '';
-}
-
-function removeProduct(codigo) {
-    selectedProducts = selectedProducts.filter(p => p.codigo !== codigo);
-    const rowToRemove = document.querySelector(`tr[data-codigo="${codigo}"]`);
-    if (rowToRemove) rowToRemove.remove();
-    updateTableState();
 }
 
 function updateQuantity(codigo, field, value) {
@@ -358,79 +273,120 @@ function updateQuantity(codigo, field, value) {
     }
 }
 
-// --- FUNCIONES DE RENDERIZADO Y ESTADO ---
+function removeProduct(codigo) {
+    selectedProducts = selectedProducts.filter(p => p.codigo !== codigo);
+    const rowToRemove = document.querySelector(`tr[data-codigo="${codigo}"]`);
+    if (rowToRemove) rowToRemove.remove();
+    updateTableState();
+}
+
 function renderSelectedRow(product) {
     const tr = document.createElement('tr');
     tr.setAttribute('data-codigo', product.codigo);
-
     tr.innerHTML = `
         <td>${product.nombre}</td>
-        <td class="editable"><input type="number" class="input-cell" min="0" value="${product.solicitada}" oninput="updateQuantity('${product.codigo}', 'solicitada', this.value)"></td>
-        <td class="editable"><input type="number" class="input-cell" min="0" value="${product.recibida}" oninput="updateQuantity('${product.codigo}', 'recibida', this.value)"></td>
+        <td class="editable"><input type="number" class="input-cell" min="0" value="${product.solicitada || ''}" oninput="updateQuantity('${product.codigo}', 'solicitada', this.value)"></td>
+        <td class="editable"><input type="number" class="input-cell" min="0" value="${product.recibida || ''}" oninput="updateQuantity('${product.codigo}', 'recibida', this.value)"></td>
         <td style="text-align:center;"><button class="btn-remove" onclick="removeProduct('${product.codigo}')">Eliminar</button></td>
     `;
     selectedTableBody.appendChild(tr);
 }
 
-function updateTableState() {
-    if (selectedProducts.length > 0) {
-        noSelectedMessage.style.display = 'none';
-        generatePDFBtn.disabled = false;
-    } else {
-        noSelectedMessage.style.display = 'block';
-        generatePDFBtn.disabled = true;
+function addProduct(product) {
+    if (selectedProducts.some(p => p.codigo === product.codigo)) {
+        alert('Este producto ya está seleccionado.');
+        return;
     }
+    const newProduct = { ...product, solicitada: '', recibida: '' };
+    selectedProducts.push(newProduct);
+    renderSelectedRow(newProduct);
+    updateTableState();
+    productResults.style.display = 'none';
+    searchInput.value = '';
 }
 
-// --- GENERACIÓN DE PDF ---
-generatePDFBtn.addEventListener('click', () => {
-    const doc = new jsPDF('p', 'mm', 'a4'); // 'p' ortrait, 'mm' milímetros, 'a4' tamaño
-
-    // --- ENCABEZADO PEQUEÑO ---
-    const now = new Date();
-    const dateStr = now.toLocaleDateString();
-    const timeStr = now.toLocaleTimeString();
-
-    doc.setFontSize(8);
-    doc.setTextColor(100);
-    // Margen superior e izquierdo (10mm)
-    doc.text(`Fecha: ${dateStr} - Hora: ${timeStr}`, 10, 8);
-    doc.text('Generado automáticamente por Selector de Productos', 200, 8, { align: 'right' }); // Alineado a la derecha
-
-
-    // --- CUERPO DEL PDF: TABLA ---
-    // Preparar los datos para autoTable
-    const headers = [['Producto', 'Cantidad Solicitada', 'Cantidad Recibida']];
-    const data = selectedProducts.map(p => [
-        p.nombre,
-        p.solicitada || '__', // Valor por defecto si está vacío
-        p.recibida || '__'    // Valor por defecto si está vacío
-    ]);
-
-    doc.autoTable({
-        head: headers,
-        body: data,
-        startY: 12, // Empieza justo debajo del encabezado
-        margin: { top: 12, bottom: 10, left: 10, right: 10 }, // Aprovechar el máximo de espacio
-        styles: {
-            fontSize: 10,
-            cellPadding: 2,
-            overflow: 'linebreak' // Permite múltiples líneas para el nombre del producto
-        },
-        headStyles: {
-            fillColor: [66, 66, 66], // Gris oscuro
-            textColor: 255,
-            fontStyle: 'bold'
-        },
-        columnStyles: {
-            0: { cellWidth: 'auto' },     // El nombre del producto ocupa lo que necesite
-            1: { cellWidth: 35, halign: 'center' }, // Ancho fijo para cantidades
-            2: { cellWidth: 35, halign: 'center' }  // Ancho fijo para cantidades
-        },
-        theme: 'striped' // O 'grid', 'plain'
+// 6. EVENTOS
+if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+        const searchTerm = e.target.value.toLowerCase().trim();
+        if (searchTerm.length < 2) {
+            productResults.style.display = 'none';
+            return;
+        }
+        const filtered = productsData.filter(p => p.nombre.toLowerCase().includes(searchTerm));
+        productResults.innerHTML = '';
+        if (filtered.length === 0) {
+            productResults.innerHTML = '<div class="result-item" style="cursor:default">No se encontraron productos.</div>';
+        } else {
+            filtered.forEach(p => {
+                const div = document.createElement('div');
+                div.className = 'result-item';
+                div.textContent = p.nombre;
+                div.onclick = () => addProduct(p);
+                productResults.appendChild(div);
+            });
+        }
+        productResults.style.display = 'block';
     });
+}
 
-    // Guardar el PDF con un nombre genérico
-    const filename = `listado-productos-${dateStr.replace(/\//g, '-')}.pdf`;
-    doc.save(filename);
+if (btnAddNew) {
+    btnAddNew.addEventListener('click', () => {
+        const sugerencia = searchInput.value.trim();
+        const nuevoNombre = prompt("Ingrese el nombre del nuevo producto:", sugerencia);
+        if (nuevoNombre && nuevoNombre.trim() !== "") {
+            const nuevoProducto = {
+                codigo: `MANUAL-${Date.now()}`, 
+                nombre: nuevoNombre.trim().toUpperCase()
+            };
+            productsData.push(nuevoProducto);
+            addProduct(nuevoProducto);
+        }
+    });
+}
+
+if (generatePDFBtn) {
+    generatePDFBtn.addEventListener('click', () => {
+        const doc = new jsPDF('p', 'mm', 'a4');
+        const now = new Date();
+        
+        doc.setFontSize(8);
+        doc.setTextColor(100);
+        doc.text(`Fecha: ${now.toLocaleDateString()} - Hora: ${now.toLocaleTimeString()}`, 10, 8);
+        doc.text('Generado por Selector de Productos', 200, 8, { align: 'right' });
+
+        const headers = [['Producto', 'Cantidad Solicitada', 'Cantidad Recibida']];
+        const data = selectedProducts.map(p => [
+            p.nombre,
+            p.solicitada || '', // Espacio en blanco si no hay cantidad
+            p.recibida || ''    // Espacio en blanco si no hay cantidad
+        ]);
+
+        doc.autoTable({
+            head: headers,
+            body: data,
+            startY: 12,
+            margin: { top: 12, bottom: 10, left: 10, right: 10 },
+            styles: { fontSize: 10, cellPadding: 2, overflow: 'linebreak' },
+            headStyles: { fillColor: [66, 66, 66], textColor: 255 },
+            columnStyles: {
+                0: { cellWidth: 'auto' },
+                1: { cellWidth: 40, halign: 'center' },
+                2: { cellWidth: 40, halign: 'center' }
+            },
+            theme: 'grid' // Cambiado a 'grid' para que se vean bien las líneas para escribir
+        });
+
+        doc.save(`Pedido-${now.toISOString().slice(0,10)}.pdf`);
+    });
+}
+
+// Cerrar resultados al clickear fuera
+document.addEventListener('click', (e) => {
+    if (productResults && !e.target.closest('.search-container')) {
+        productResults.style.display = 'none';
+    }
 });
+
+// Inicialización
+updateTableState();
