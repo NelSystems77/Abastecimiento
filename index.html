@@ -14,7 +14,10 @@
     </header>
 
     <div class="search-container">
-        <input type="text" id="searchInput" placeholder="Buscar producto por nombre...">
+        <div style="display: flex; gap: 10px;">
+            <input type="text" id="searchInput" placeholder="Buscar producto por nombre...">
+            <button id="btnAddNew" class="btn-secondary" title="Crear producto nuevo">+ Nuevo</button>
+        </div>
         <div id="productResults" class="results-list"></div>
     </div>
 
