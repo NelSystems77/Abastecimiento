@@ -377,7 +377,7 @@ if (generatePDFBtn) {
         // Estilos del encabezado
         doc.setFontSize(18);
         doc.setTextColor(40);
-        doc.text("Pedido de Farmacia", 14, 20);
+        doc.text("Abastecimiento de Despacho", 14, 20);
         
         doc.setFontSize(10);
         doc.text(`Fecha: ${dateStr}`, 14, 28);
@@ -386,8 +386,8 @@ if (generatePDFBtn) {
         const rows = selectedProducts.map((p, i) => [
             i + 1,
             p.nombre,
-            p.solicitada || "0",
-            p.recibida || "0"
+            p.solicitada || " ",
+            p.recibida || " "
         ]);
 
         doc.autoTable({
