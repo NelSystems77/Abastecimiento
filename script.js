@@ -1,7 +1,7 @@
 // 1. INICIALIZACIÓN DE LIBRERÍAS
 const { jsPDF } = window.jspdf;
 
-// 2. TUS DATOS JSON
+// 2. TUS DATOS JSON COMPLETOS (Base de búsqueda)
 const productsData = [
     { "codigo": "1-10-16-0010", "nombre": "CN PARACETAMOL 500 MG, TABLETA" },
     { "codigo": "1-10-09-0020", "nombre": "CN ACETAZOLAMIDA 250 MG. TABLETAS" },
@@ -253,10 +253,23 @@ const productResults = document.getElementById('productResults');
 const selectedTableBody = document.getElementById('selectedTableBody');
 const noSelectedMessage = document.getElementById('noSelectedMessage');
 const generatePDFBtn = document.getElementById('generatePDF');
-const btnAddNew = document.getElementById('btnAddNew');
 const btnLoadMaster = document.getElementById('btnLoadMaster');
 
-// 5. FUNCIONES DE LÓGICA
+// 5. FUNCIONES GLOBALES (Asignadas a window para que el HTML dinámico las encuentre)
+window.updateQuantity = function(codigo, field, value) {
+    const product = selectedProducts.find(p => p.codigo === codigo);
+    if (product) {
+        product[field] = value;
+    }
+};
+
+window.removeProduct = function(codigo) {
+    selectedProducts = selectedProducts.filter(p => p.codigo !== codigo);
+    const rowToRemove = document.querySelector(`tr[data-codigo="${codigo}"]`);
+    if (rowToRemove) rowToRemove.remove();
+    updateTableState();
+};
+
 function updateTableState() {
     if (selectedProducts.length > 0) {
         noSelectedMessage.style.display = 'none';
@@ -266,22 +279,6 @@ function updateTableState() {
         if (generatePDFBtn) generatePDFBtn.disabled = true;
     }
 }
-
-// Función global para actualizar cantidades (necesaria para los oninput del HTML generado)
-window.updateQuantity = function(codigo, field, value) {
-    const product = selectedProducts.find(p => p.codigo === codigo);
-    if (product) {
-        product[field] = value;
-    }
-};
-
-// Función global para eliminar (necesaria para onclick)
-window.removeProduct = function(codigo) {
-    selectedProducts = selectedProducts.filter(p => p.codigo !== codigo);
-    const rowToRemove = document.querySelector(`tr[data-codigo="${codigo}"]`);
-    if (rowToRemove) rowToRemove.remove();
-    updateTableState();
-};
 
 function renderSelectedRow(product) {
     const tr = document.createElement('tr');
@@ -308,22 +305,21 @@ function addProduct(product) {
     searchInput.value = '';
 }
 
-// Listado Maestro (Simplificado para el ejemplo, pero usa tu lista de 264 ítems)
+// 6. LISTADO MAESTRO COMPLETO (264 ítems)
 const masterListNames = [
-    "CN LEVODOPA 100 MG. Y CARBIDOPA AN", "CN LEVOMEPROMAZINA BASE 25 MG (CO", 
-    "CN FENITOINA SODICA 100 MG. DE ACCI", "CN METOCLOPRAMIDA BASE 10 MG. (CO",
-    // ... agrega el resto de tus 264 nombres aquí
+    "CN LEVODOPA 100 MG. Y CARBIDOPA AN", "CN LEVOMEPROMAZINA BASE 25 MG (CO", "CN FENITOINA SODICA 100 MG. DE ACCI", "CN METOCLOPRAMIDA BASE 10 MG. (CO", "CN DEXTROMETORFANO BROMOHIDRAT", "CN DIMENHIDRINATO 50 MG., TABLETAS", "CN DIFENHIDRAMINA CLORHIDRATO 50 M", "CN ALFACALCIDOL 1 MCG. CAPSULAS DE", "CN ACIDO ASCORBICO 500 MG. O ACIDO", "CN ACIDO FOLICO 1 MG, TABLETAS RANU", "CN VALPROATO SEMISODICO EQUIVALE", "CN VITAMINA B-6 ( PIRIDOXINA CLORHI", "CN PARACETAMOL 500 MG, TABLETA", "EC26", "CN PREPARACION ANTIHEMORROIDAL. F", "TU BETAMETASONA ( COMO 17 VALERAT", "DOMEBORO", "ACEITE MINERAL TÓPICO", "LACTULOSA", "VIT D3 GTAS", "SHAMPOO DE BREA", "TU BETAMETASONA BASE AL 0.1% (1 MG", "TU ESTROGENOS CONJUGADOS F.E.U. 0", "TU CREMA DE ROSAS. TUBO DE 40 G A 6", "TU HIDROCORTISONA BASE AL .025% (", "TU LIDOCAÍNA HIDROCLORURO 2% (20 M", "CN PROPRANOLOL CLORHIDRATO 10 MG", "CN PREDNISOLONA 25 MG., TABLETA", "CN PREDNISOLONA 5 MG, TABLETA", "CN PROPRANOLOL CLORHIDRATO 40 MG", "CN ESPIRONOLACTONA 100 MG. TABLET", "CN ALENDRONATO (COMO SAL MONOSOD", "CN ESTROGENOS CONJUGADOS 0.625 M", "CN FUROSEMIDA 40 MG., TABS.", "CN ALFACALCIDOL 0.25 MCG CAPSULAS D", "CN ALOPURINOL 300 MG. TABLETAS.", "CN METOTREXATO 2.5 MG BASE, TABLE", "CN AMIODARONA CLORHIDRATO 200 MG", "CN LOVASTATINA 20 MG. TABLETAS.", "CN IBUPROFENO 400 MG. TABLETAS REC", "CN ALUMINIO HIDRÓXIDO 200 MG Y MAG", "CN FAMOTIDINA 40 MG. TABLETAS O TA", "CN IRBESARTAN 150 MG TABLETA RECUB", "CN ACIDO ACETIL SALICILICO 100 MG. T", "CN TENOXICAN 20 MG.TABLETAS RECUB", "CN HIDRALAZINA CLORHIDRATO 50 MG. T", "CN SULINDACO 200 MG.TABLETAS.", "CN BIPERIDENO HIDROCLORURO 2 MG. T", "CN GLIBENCLAMIDA ( NO MICRONIZADA )", "CN GLICLAZIDA 80 MG- TABLETA.", "CN HIDROXIZINA CLORHIDRATO25 MG. O", "CN AMITRIPTILINA CLORHIDRATO 10 M", "CN VITAMINA B-1 ( TIAMINA CLORHIDRAT", "TR ESTRADIOL VALERIANATO Y ESTRA", "CN CARBAMAZEPINA 200 MG, TABLETAS.", "CN HIERRO FUMARATO 200 MG., TABS.", "CN LAMOTRIGINA 100 MG. TABLETA DIS", "CN METILDOPA ( LEVO - ALFA ) 250 MG.", "CN METILDOPA 500 MG, TABLETAS RECU", "CN CALCIO IONICO 3OO MG.(EQUIVALEN", "CN CLORFENAMINA MALEATO 4 MG (SI", "CN CLORPROMAZINA HIDROCLORURO ( E", "ARCEDOL", "CN BUTILBROMURO DE HIOSCINA 10", "CN HIDROCLOROTIAZIDA 25 MG. TABLE", "CN AMLODIPINO 5 MG.(COMO BESILATO D", "CN ENALAPRIL MALEATO 20 MG. TABLET", "CN LORATADINA FEXOFENADINA HIDROCLORURO DE 1", "CN ATENOLOL 50 MG. TABLETAS.", "CN LEVOTIROXINA SODICA 0.10 MG. TAB", "CN ENALAPRIL MALEATO 5 MG. TABLETA", "CN FUROSEMIDA 40 MG., TABS.", "BECLO ORAL", "ATROVENT", "CN HIERRO FUMARATO 200 MG., TABS.", "BECONASE", "SBT INH", "LECHE MAGNESIA", "CN ALUMINIO HIDROXIDO SIN MAGNESI", "SACARINA", "VALPROATO LÍQUIDO", "HIDROXICINA JBE", "CN MICOFENOLATO DE MOFETILO 250", "LORATADINA JBE", "TU HIDROCORTISONA BASE AL 1% (10", "PAY2", "QUITACEL", "TU SULFADIAZINA DE PLATA AL 1% (10 M", "TU TIOCONAZOL AL 1% (10 MG/GRAMO)", "TU TETRACICLINA CLORHIDRATO AL 1% (", "CN TIOCONAZOL 100 MG. TABLETAS VAG", "ACYCLOVIR TÓPICO", "VIT C GOTAS", "HIDRO LOCIÓN", "EPAMIN LÍQUIDO", "IBUPRUFENO LÍQUIDO", "PETROLATO LÍQUIDO PESADO", "TU FUSIDATO SODICO 2% (20 MG/G). U", "CN OXIBUTININA HIDROCLORURO 5 MG,", "CN LITIO CARBONATO 300 MG. TABLETAS", "CN LOPERAMIDA CLORHIDRATO 2 MG. T", "CN ALBENDAZOL 200 MG. TABLETA O TA", "CN MEDROXIPROGESTERONA ACETATO 5", "CN ACETAZOLAMIDA 250 MG. TABLETAS", "CN ACICLOVIR 400 MG. TABLETAS O TAB", "CN AZATIOPRINA 50 MG, TABLETA CON", "CN ALUMINIO HIDROXIDO SIN MAGNESI", "CN GEMFIBROZILO 600 MG. TABLETA RE", "ELECTROLITOS", "NORGYLEN", "NORGYL", "PRESERVATIVOS", "ROSUVASTATINA", "METICEL", "FC LATANOPROST AL 0,005% (50 UG / ML)", "CN ALFUZOSINA HIDROCLORURO 10 MG T", "DORZOLAMIDA", "VISINA", "TIMOLOL", "OLOPATADINA", "MUCILAGO", "CN FLUOXETINA (COMO CLORHIDRATO) 2", "CN METRONIDAZOL 500 MG. TABLETAS.", "CN PROPILTIOURACILO 50 MG., TABLETA", "CN PERFENAZINA 4 MG. TABLETA RECUB", "CN CLOZAPINA 100 MG. TABLETAS.", "CN BROMOCRIPTINA BASE 2.5 MG.(COM", "CN PRIMIDONA 250 MG., TABLETAS", "CN SULFASALACINA 500 MG.TABLETAS C", "CN CIPROFLOXACINO BASE 500 MG (COM", "CN HALOPERIDOL 5 MG., TABLETAS", "CN HIDROCORTISONA 20 MG., TABLETA", "CN NITROGLICERINA 0.5 A 0.6 MG. TABL", "CN SALBUTAMOL ( COMO SULFATO ) 4 M", "CN DEXAMETASONA 0.5 MG. TABLETAS.", "CN COLCHICINA 0.5 O 0.6 MG. TABLETAS", "CN TIZANIDINA HIDROCLORURO 4 MG . T", "CN PREDNISOLONA 1 MG., TABLETA", "CN TAMOXIFENO BASE 20 MG. (COMO C", "CN TEOFILINA ANHIDRA 150 MG. TABLET", "CN TRIFLUOPERAZINA ( COMO DICLORH", "CN TEOFILINA ANHIDRA A.P. 250 MG A 3", "CN HIDROXICLOROQUINA BASE 310 MG (", "CN IMIPRAMINA CLORHIDRATO 10 MG. T", "CN IMIPRAMINA CLORHIDRATO 25 MG. T", "CN INDOMETACINA 25 MG., CAPSULAS", "CN GEMFIBROZILO 600 MG. TABLETA RE", "CN ENALAPRIL MALEATO 5 MG. TABLETA", "CN LEVOTIROXINA SODICA 0.10 MG. TAB", "CN FUROSEMIDA 40 MG., TABS.", "CN LORATADINA FEXOFENADINA HIDROCLORURO DE 1", "CN ATENOLOL 50 MG. TABLETAS.", "CN ENALAPRIL MALEATO 20 MG. TABLET", "CN BUTILBROMURO DE HIOSCINA 10", "CN GABAPENTINA 300 MG. CÁPSULAS.", "CN VENLAFAXINA HIDROCLORURO EQUI", "CN OMEPRAZOL 20 MG, CÁPSULA DE LI", "X", "CN PANCREALIPASA (4000 UNIDADES F.", "CN DIGOXINA 0,25 MG, TABLETA", "CN WARFARINA SODICA 5 MG. TABLETA", "CN MESALAZINA 500 MG (TABLETA DE L", "CN WARFARINA SODICA 1 MG. TABLETA", "ISONIAZIDA", "CN ISOSORBIDE DINITRATO 20 MG. TAB", "CN IVERMECTINA 6 MG. TABLETAS.", "X", "TRAMAL GOTAS", "HIERRO GOTAS", "SULISOBENZONA", "HALDOL GOTAS", "CN RISPERIDONA 1 MILIGRAMO. TABLET", "CN BETANECOL CLORURO 10 MG. TABL", "CN CARVEDILOL 6.25 MG, TABLETAS RE", "CN MONTELUKAST 5 MG, (COMO MONTE", "CN MONTELUKAST 10 MG (COMO MONTE", "CN VERAPAMILO CLORHIDRATO 80 MG. T", "CN CLOPIDOGREL (COMO BISULFATO) 7", "CN METILDOPA 500 MG, TABLETAS RECU", "CN LAMOTRIGINA 100 MG. TABLETA DIS", "CN METILDOPA ( LEVO - ALFA ) 250 MG.", "CN HIERRO FUMARATO 200 MG., TABS.", "CN CODEINA FOSFATO HEMIHIDRATADA", "CN CLORPROMAZINA HIDROCLORURO ( E", "CN CLORFENAMINA MALEATO 4 MG (SI", "CN CALCIO IONICO 3OO MG.(EQUIVALEN", "ACEITE MINERAL TÓPICO", "LACTULOSA", "SHAMPOO DE BREA", "CN ALFACALCIDOL 0.25 MCG CAPSULAS D", "EC26", "CN PREPARACION ANTIHEMORROIDAL. F", "CN FLUCONAZOL 200 MG. CAPSULAS O T", "VITAMINA A", "CN ITRACONAZOL 100 MG. CAPSULAS.", "CLINDAMICINA AMP", "TU OXIDO DE ZINC FÓRMULA. CREMA T", "CN TENOXICAN 20 MG.TABLETAS RECUB", "CN PROPRANOLOL CLORHIDRATO 40 MG", "CN HIDRALAZINA CLORHIDRATO 50 MG. T", "CN PROPRANOLOL CLORHIDRATO 10 MG", "CN HIDROXIZINA CLORHIDRATO25 MG. O", "CN BIPERIDENO HIDROCLORURO 2 MG. T", "CN GLICLAZIDA 80 MG- TABLETA.", "CN GLIBENCLAMIDA ( NO MICRONIZADA )", "CN CARBAMAZEPINA 200 MG, TABLETAS.", "TR ESTRADIOL VALERIANATO Y ESTRA", "CN VITAMINA B-1 ( TIAMINA CLORHIDRAT", "CN AMITRIPTILINA CLORHIDRATO 10 M", "CN AMLODIPINO 5 MG.(COMO BESILATO D", "CN HIDROCLOROTIAZIDA 25 MG. TABLE", "CN ALUMINIO HIDRÓXIDO 200 MG Y MAG", "CN ACIDO ACETIL SALICILICO 100 MG. T", "CN METFORMINA HIDROCLORURO 500 M", "BECLO ORAL", "ATROVENT", "BECONASE", "SBT INH", "CN HIERRO FUMARATO 200 MG., TABS.", "LECHE MAGNESIA", "CN ALUMINIO HIDROXIDO SIN MAGNESI", "CN SULINDACO 200 MG.TABLETAS.", "CN PREDNISOLONA 25 MG., TABLETA", "CN PREDNISOLONA 5 MG, TABLETA", "CN FUROSEMIDA 40 MG., TABS.", "CN ALENDRONATO (COMO SAL MONOSOD", "CN ESTROGENOS CONJUGADOS 0.625 M", "CN ESPIRONOLACTONA 100 MG. TABLET", "CN AMIODARONA CLORHIDRATO 200 MG", "CN METOTREXATO 2.5 MG BASE, TABLE", "CN ALOPURINOL 300 MG. TABLETAS.", "CN ALFACALCIDOL 0.25 MCG CAPSULAS D", "CN IRBESARTAN 150 MG TABLETA RECUB", "CN IBUPROFENO 400 MG. TABLETAS REC", "CN FAMOTIDINA 40 MG. TABLETAS O TA", "TU BETAMETASONA BASE AL 0.1% (1 MG", "TU ESTROGENOS CONJUGADOS F.E.U. 0", "TU CREMA DE ROSAS. TUBO DE 40 G A 6", "TU HIDROCORTISONA BASE AL .025% (", "TU LIDOCAÍNA HIDROCLORURO 2% (20 M", "CN METOCLOPRAMIDA BASE 10 MG. (CO", "CN FENITOINA SODICA 100 MG. DE ACCI", "CN LEVOMEPROMAZINA BASE 25 MG (CO", "CN LEVODOPA 100 MG. Y CARBIDOPA AN", "CN ALFACALCIDOL 1 MCG. CAPSULAS DE", "CN DIFENHIDRAMINA CLORHIDRATO 50 M", "CN DIMENHIDRINATO 50 MG., TABLETAS", "CN DEXTROMETORFANO BROMOHIDRAT", "CN VITAMINA B-6 ( PIRIDOXINA CLORHI", "CN VALPROATO SEMISODICO EQUIVALE", "CN ACIDO FOLICO 1 MG, TABLETAS RANU", "CN ACIDO ASCORBICO 500 MG. O ACIDO", "CN LOVASTATINA 20 MG. TABLETAS.", "CN PARACETAMOL 500 MG, TABLETA", "SACARINA", "VALPROATO LÍQUIDO", "HIDROXICINA JBE", "CN MICOFENOLATO DE MOFETILO 250", "LORATADINA JBE", "TU TIOCONAZOL AL 1% (10 MG/GRAMO)", "CN TIOCONAZOL 100 MG. TABLETAS VAG", "TU SULFADIAZINA DE PLATA AL 1% (10 M", "TU FUSIDATO SODICO 2% (20 MG/G). U", "QUITACEL"
 ];
 
+// 7. EVENTOS
 if (btnLoadMaster) {
     btnLoadMaster.addEventListener('click', () => {
-        if (confirm("¿Cargar el listado completo?")) {
+        if (confirm("¿Cargar el listado maestro completo de 264 productos?")) {
             selectedProducts = [];
             selectedTableBody.innerHTML = '';
             
             masterListNames.forEach((name, index) => {
                 const prod = {
-                    codigo: `L-` + String(index + 1).padStart(3, '0'), 
+                    codigo: `M-${String(index + 1).padStart(3, '0')}`,
                     nombre: name,
                     solicitada: '',
                     recibida: ''
@@ -336,7 +332,6 @@ if (btnLoadMaster) {
     });
 }
 
-// 6. EVENTOS DE BÚSQUEDA
 if (searchInput) {
     searchInput.addEventListener('input', (e) => {
         const searchTerm = e.target.value.toLowerCase().trim();
@@ -366,52 +361,62 @@ if (searchInput) {
     });
 }
 
-// 7. FUNCIÓN PARA GENERAR Y DESCARGAR PDF
+// 8. GENERACIÓN Y DESCARGA DE PDF (Corregida con objeto de inicialización)
 if (generatePDFBtn) {
     generatePDFBtn.addEventListener('click', () => {
-        const doc = new jsPDF();
+        // Corrección del error de parámetros deprecados: usar un único objeto
+        const doc = new jsPDF({
+            orientation: "p",
+            unit: "mm",
+            format: "a4"
+        });
+
         const now = new Date();
         const dateStr = now.toLocaleDateString();
 
-        // Título del Documento
+        // Estilos del encabezado
         doc.setFontSize(18);
-        doc.text("Pedido de Medicamentos", 14, 20);
+        doc.setTextColor(40);
+        doc.text("Pedido de Farmacia", 14, 20);
         
         doc.setFontSize(10);
-        doc.text(`Fecha de generación: ${dateStr}`, 14, 28);
+        doc.text(`Fecha: ${dateStr}`, 14, 28);
 
-        // Preparar datos para la tabla del PDF
-        const tableRows = selectedProducts.map((p, index) => [
-            index + 1,
+        // Mapeo de datos para autoTable
+        const rows = selectedProducts.map((p, i) => [
+            i + 1,
             p.nombre,
             p.solicitada || "0",
             p.recibida || "0"
         ]);
 
-        // Generar Tabla
         doc.autoTable({
             startY: 35,
-            head: [['#', 'Producto', 'Cant. Solicitada', 'Cant. Recibida']],
-            body: tableRows,
+            head: [['#', 'Nombre del Producto', 'Solicitado', 'Recibido']],
+            body: rows,
             theme: 'grid',
             headStyles: { fillColor: [41, 128, 185], textColor: 255 },
             styles: { fontSize: 8, cellPadding: 2 },
             columnStyles: {
                 0: { cellWidth: 10 },
-                1: { cellWidth: 'auto' },
-                2: { cellWidth: 30, halign: 'center' },
-                3: { cellWidth: 30, halign: 'center' }
+                2: { cellWidth: 25, halign: 'center' },
+                3: { cellWidth: 25, halign: 'center' }
+            },
+            // Pie de página automático (ej: pág 1 de X)
+            didDrawPage: (data) => {
+                const str = "Pagina " + doc.internal.getNumberOfPages();
+                doc.setFontSize(8);
+                doc.text(str, data.settings.margin.left, doc.internal.pageSize.height - 10);
             }
         });
 
-        // Descargar el archivo
         doc.save(`Pedido_${dateStr.replace(/\//g, '-')}.pdf`);
     });
 }
 
-// Cerrar resultados al hacer clic fuera
+// Cerrar búsqueda al hacer clic fuera
 document.addEventListener('click', (e) => {
-    if (e.target !== searchInput) {
+    if (!searchInput.contains(e.target) && !productResults.contains(e.target)) {
         productResults.style.display = 'none';
     }
 });
