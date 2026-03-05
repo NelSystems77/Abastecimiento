@@ -523,8 +523,8 @@ if (generatePDF2Btn) {
                 fontSize: 7, 
                 cellPadding: 0.5, 
                 overflow: 'linebreak', 
-                lineColor: [50, 50, 50], 
-                lineWidth: 0.3 
+                lineColor: [40, 40, 40], 
+                lineWidth: 0.5 
             },
             headStyles: {
                 fillColor: [66, 66, 66], 
