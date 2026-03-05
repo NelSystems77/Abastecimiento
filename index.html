@@ -40,9 +40,11 @@
             </table>
         </div>
         <div id="noSelectedMessage" class="no-results">No hay productos seleccionados.</div>
-        <button id="generatePDF" class="btn-primary" disabled>Generar PDF (A4)</button>
+        <div style="text-align:center; display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
+            <button id="generatePDF" class="btn-primary" disabled>Generar PDF Lista</button>
+            <button id="generatePDF2" class="btn-primary" style="background-color: #f39c12;">Generar PDF Turnos (Maestro 1-146)</button>
+        </div>
     </div>
-</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
