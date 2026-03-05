@@ -493,12 +493,12 @@ if (generatePDF2Btn) {
         doc.setFontSize(8);
         doc.setTextColor(100);
         doc.text(`Fecha: ${dateStr} - Hora: ${timeStr}`, 5, 8); 
-        doc.text('Hoja de Control de Turnos de Farmacia', 205, 8, { align: 'right' });
+        doc.text('Hoja para abastecer despacho', 205, 8, { align: 'right' });
 
         // Título principal centrado
         doc.setFontSize(14);
         doc.setTextColor(40);
-        doc.text("Hoja de Control de Turnos - Maestro (1 al 146)", 105, 18, { align: 'center' });
+        doc.text("Solicitud Stock 772", 105, 18, { align: 'center' });
 
         const headers = [['#', 'Nombre del Producto', 'L-A', 'L-B', 'K-A', 'K-B', 'M-A', 'M-B', 'J-A', 'J-B', 'V-A', 'V-B', 'S-A', 'S-B', 'D-A', 'D-B']];
 
