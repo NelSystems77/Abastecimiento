@@ -259,7 +259,7 @@ const btnLoadMaster = document.getElementById('btnLoadMaster');
 const generatePDF2Btn = document.getElementById('generatePDF2'); 
 
 // 5. VARIABLES DE DATOS PARA PDF2 (Subconjunto del maestro 1 al 146 inclusive)
-const productsForPDF2 = productsData.slice(0, 146);
+// const productsForPDF2 = productsData.slice(0, 146);
 
 // 6. FUNCIONES GLOBALES (Asignadas a window para que el HTML dinámico las encuentre)
 window.updateQuantity = function(codigo, field, value) {
@@ -489,77 +489,64 @@ if (generatePDF2Btn) {
         const dateStr = now.toLocaleDateString();
         const timeStr = now.toLocaleTimeString();
 
-        // Encabezado de Página pequeño y alineado
+        // Encabezado
         doc.setFontSize(8);
         doc.setTextColor(100);
-        // Usamos márgenes pequeños de 5mm para maximizar ancho de tabla
         doc.text(`Fecha: ${dateStr} - Hora: ${timeStr}`, 5, 8); 
-        doc.text('Hoja de Control de Turnos de Farmacia (Maestro 1-146) - Selector de Productos', 205, 8, { align: 'right' });
+        doc.text('Hoja de Control de Turnos de Farmacia', 205, 8, { align: 'right' });
 
         // Título principal centrado
         doc.setFontSize(14);
         doc.setTextColor(40);
         doc.text("Hoja de Control de Turnos - Maestro (1 al 146)", 105, 18, { align: 'center' });
 
-        // Encabezados de Tabla exactos de la imagen de ejemplo (16 columnas)
         const headers = [['#', 'Nombre del Producto', 'L-A', 'L-B', 'K-A', 'K-B', 'M-A', 'M-B', 'J-A', 'J-B', 'V-A', 'V-B', 'S-A', 'S-B', 'D-A', 'D-B']];
 
-        // Cuerpo de Tabla: Mapear datos para crear filas
-        // Usamos la variable 'productsForPDF2' que definimos al inicio con slice(0, 146)
-        const data = productsForPDF2.map((p, index) => [
-            index + 1, // Número de línea
-            p.nombre, // Nombre del producto
-            // 14 celdas vacías para los turnos para que se impriman las líneas de cuadrícula para escribir a mano
-            '', '', '', '', '', '', '', '', '', '', '', '', '', '' 
+        // AQUÍ ESTÁ LA SOLUCIÓN:
+        // Tomamos los primeros 146 elementos directamente del arreglo masterListNames
+        const namesForPDF2 = masterListNames.slice(0, 146);
+
+        // Mapeamos esos nombres exactos al formato de la tabla
+        const data = namesForPDF2.map((name, index) => [
+            index + 1, // Número de línea (del 1 al 146)
+            name,      // El nombre respetando el orden de tu lista maestra
+            '', '', '', '', '', '', '', '', '', '', '', '', '', '' // 14 espacios en blanco
         ]);
 
-        // Generar Tabla con autotable para maximizar espacio
+        // Generar Tabla
         doc.autoTable({
             head: headers,
             body: data,
-            startY: 24, // Debajo del encabezado de página y título
-            margin: { top: 24, bottom: 10, left: 5, right: 5 }, // Márgenes mínimos de 5mm para maximizar ancho
+            startY: 24,
+            margin: { top: 24, bottom: 10, left: 5, right: 5 }, 
             styles: {
-                fontSize: 7, // Tamaño de fuente muy pequeño para ajustar 16 columnas en A4
-                cellPadding: 0.5, // Padding mínimo para maximizar espacio de texto
-                overflow: 'linebreak', // Permite múltiples líneas para nombres largos de productos
-                lineColor: [200, 200, 200], // Líneas de cuadrícula gris claro
-                lineWidth: 0.1 // Grosor de línea fino
+                fontSize: 7, 
+                cellPadding: 0.5, 
+                overflow: 'linebreak', 
+                lineColor: [200, 200, 200], 
+                lineWidth: 0.1 
             },
             headStyles: {
-                fillColor: [66, 66, 66], // Gris oscuro para el encabezado
-                textColor: 255, // Texto blanco
+                fillColor: [66, 66, 66], 
+                textColor: 255, 
                 fontStyle: 'bold',
-                halign: 'center' // Centrar encabezados
+                halign: 'center' 
             },
             columnStyles: {
-                // Definimos anchos fijos para todas las columnas para que quepan y no se corten
-                // Ancho total disponible en A4Vertical con márgenes de 5mm = 210 - 10 = 200mm
-                0: { cellWidth: 8, halign: 'center' }, // Columna "#" estrecha y centrada
-                
-                // Columna "Nombre" ajustable con salto de línea. El ancho calculado es 200 - 8 - 14*10 = 52.
+                0: { cellWidth: 8, halign: 'center' }, 
                 1: { cellWidth: 52 }, 
-                
-                // Definimos ancho fijo de 10mm para cada una de las 14 columnas de turno (total 140mm)
-                2: { cellWidth: 10, halign: 'center' }, 
-                3: { cellWidth: 10, halign: 'center' },
-                4: { cellWidth: 10, halign: 'center' },
-                5: { cellWidth: 10, halign: 'center' },
-                6: { cellWidth: 10, halign: 'center' },
-                7: { cellWidth: 10, halign: 'center' },
-                8: { cellWidth: 10, halign: 'center' },
-                9: { cellWidth: 10, halign: 'center' },
-                10: { cellWidth: 10, halign: 'center' },
-                11: { cellWidth: 10, halign: 'center' },
-                12: { cellWidth: 10, halign: 'center' },
-                13: { cellWidth: 10, halign: 'center' },
-                14: { cellWidth: 10, halign: 'center' },
-                15: { cellWidth: 10, halign: 'center' }
+                2: { cellWidth: 10, halign: 'center' }, 3: { cellWidth: 10, halign: 'center' },
+                4: { cellWidth: 10, halign: 'center' }, 5: { cellWidth: 10, halign: 'center' },
+                6: { cellWidth: 10, halign: 'center' }, 7: { cellWidth: 10, halign: 'center' },
+                8: { cellWidth: 10, halign: 'center' }, 9: { cellWidth: 10, halign: 'center' },
+                10: { cellWidth: 10, halign: 'center' }, 11: { cellWidth: 10, halign: 'center' },
+                12: { cellWidth: 10, halign: 'center' }, 13: { cellWidth: 10, halign: 'center' },
+                14: { cellWidth: 10, halign: 'center' }, 15: { cellWidth: 10, halign: 'center' }
             },
-            theme: 'grid' // Tema 'grid' para que se imprima toda la cuadrícula y sirva de guía
+            theme: 'grid' 
         });
 
-        // Descargar el PDF con un nombre descriptivo
+        // Descargar el PDF
         const filename = `Hoja_Turnos_Maestro_1-146_${dateStr.replace(/\//g, '-')}.pdf`;
         doc.save(filename);
     });
