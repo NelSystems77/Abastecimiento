@@ -423,134 +423,81 @@ if (searchInput) {
 }
 
 // 9. GENERACIÓN DE PDF1 (Original - Lista con Cantidades)
-if (generatePDFBtn) {
-    generatePDFBtn.addEventListener('click', () => {
-        // Corrección del error de parámetros deprecados: usar un único objeto
+if (generatePDF2Btn) {
+    generatePDF2Btn.addEventListener('click', () => {
         const doc = new jsPDF({
             orientation: "p",
             unit: "mm",
-            format: "a4"
+            format: "letter"
         });
 
         const now = new Date();
         const dateStr = now.toLocaleDateString();
         const timeStr = now.toLocaleTimeString();
 
-        // Estilos del encabezado de página
-        doc.setFontSize(8);
+        doc.setFontSize(9);
         doc.setTextColor(100);
-        doc.text(`Fecha: ${dateStr} - Hora: ${timeStr}`, 10, 8);
-        doc.text('Generado automáticamente por Selector de Productos', 200, 8, { align: 'right' });
+        doc.text(`Fecha: ${dateStr} - Hora: ${timeStr}`, 5, 8); 
+        doc.text('Hoja para abastecer despacho', 211, 8, { align: 'right' });
 
         doc.setFontSize(16);
         doc.setTextColor(40);
-        doc.text("Pedido de Farmacia - Lista con Cantidades", 14, 20);
-
-        // Mapeo de datos para autoTable
-        // MODIFICACIÓN: Enviar '' (cadena vacía) en lugar de '0' si no hay cantidad solicitada/recibida
-        const rows = selectedProducts.map((p, i) => [
-            i + 1,
-            p.nombre,
-            p.solicitada || "", // Cambiado a string vacío
-            p.recibida || ""    // Cambiado a string vacío
-        ]);
-
-        doc.autoTable({
-            startY: 28,
-            head: [['#', 'Nombre del Producto', 'Solicitado', 'Recibido']],
-            body: rows,
-            theme: 'grid', // 'grid' para que se vean bien las líneas para escribir a mano
-            headStyles: { fillColor: [66, 66, 66], textColor: 255, halign: 'center' },
-            styles: { fontSize: 9, cellPadding: 2, overflow: 'linebreak' },
-            columnStyles: {
-                0: { cellWidth: 10, halign: 'center' },
-                1: { cellWidth: 'auto' }, // El nombre ocupa lo que necesite
-                2: { cellWidth: 35, halign: 'center' }, // Ancho fijo para cantidades
-                3: { cellWidth: 35, halign: 'center' }  // Ancho fijo para cantidades
-            }
-        });
-
-        const filename = `Pedido-Lista-${dateStr.replace(/\//g, '-')}.pdf`;
-        doc.save(filename);
-    });
-}
-
-// --- NUEVA LÓGICA PARA PDF2 (Turnos Maestro 1-146) ---
-if (generatePDF2Btn) {
-    generatePDF2Btn.addEventListener('click', () => {
-        // Inicializar jsPDF para hoja A4 vertical
-        const doc = new jsPDF({
-            orientation: "p",
-            unit: "mm",
-            format: "a4"
-        });
-
-        const now = new Date();
-        const dateStr = now.toLocaleDateString();
-        const timeStr = now.toLocaleTimeString();
-
-        // Encabezado
-        doc.setFontSize(8);
-        doc.setTextColor(100);
-        doc.text(`Fecha: ${dateStr} - Hora: ${timeStr}`, 5, 8); 
-        doc.text('Hoja para abastecer despacho', 205, 8, { align: 'right' });
-
-        // Título principal centrado
-        doc.setFontSize(14);
-        doc.setTextColor(40);
-        doc.text("Solicitud Stock 772", 105, 18, { align: 'center' });
+        doc.text("Solicitud Stock 772", 108, 18, { align: 'center' });
 
         const headers = [['#', 'Nombre del Producto', 'L-A', 'L-B', 'K-A', 'K-B', 'M-A', 'M-B', 'J-A', 'J-B', 'V-A', 'V-B', 'S-A', 'S-B', 'D-A', 'D-B']];
 
-        // AQUÍ ESTÁ LA SOLUCIÓN:
-        // Tomamos los primeros 146 elementos directamente del arreglo masterListNames
         const namesForPDF2 = masterListNames.slice(0, 146);
-
-        // Mapeamos esos nombres exactos al formato de la tabla
         const data = namesForPDF2.map((name, index) => [
-            index + 1, // Número de línea (del 1 al 146)
-            name,      // El nombre respetando el orden de tu lista maestra
-            '', '', '', '', '', '', '', '', '', '', '', '', '', '' // 14 espacios en blanco
+            index + 1,
+            name,
+            '', '', '', '', '', '', '', '', '', '', '', '', '', ''
         ]);
 
-        // Generar Tabla
         doc.autoTable({
             head: headers,
             body: data,
             startY: 24,
-            margin: { top: 24, bottom: 10, left: 5, right: 5 }, 
+            margin: { top: 15, bottom: 10, left: 5, right: 5 },
             styles: {
-                fontSize: 7, 
-                cellPadding: 0.5, 
-                overflow: 'linebreak', 
-                lineColor: [40, 40, 40], 
-                lineWidth: 0.5 
+                fontSize: 11,         // ← Letra grande y legible
+                cellPadding: 2,       // ← Padding cómodo para escribir a mano
+                overflow: 'linebreak',
+                lineColor: [40, 40, 40],
+                lineWidth: 0.5
             },
             headStyles: {
-                fillColor: [66, 66, 66], 
-                textColor: 255, 
+                fillColor: [66, 66, 66],
+                textColor: 255,
                 fontStyle: 'bold',
-                halign: 'center' 
+                halign: 'center',
+                fontSize: 10
             },
             columnStyles: {
-                0: { cellWidth: 8, halign: 'center' }, 
-                1: { cellWidth: 52 }, 
-                2: { cellWidth: 10, halign: 'center' }, 3: { cellWidth: 10, halign: 'center' },
-                4: { cellWidth: 10, halign: 'center' }, 5: { cellWidth: 10, halign: 'center' },
-                6: { cellWidth: 10, halign: 'center' }, 7: { cellWidth: 10, halign: 'center' },
-                8: { cellWidth: 10, halign: 'center' }, 9: { cellWidth: 10, halign: 'center' },
-                10: { cellWidth: 10, halign: 'center' }, 11: { cellWidth: 10, halign: 'center' },
-                12: { cellWidth: 10, halign: 'center' }, 13: { cellWidth: 10, halign: 'center' },
-                14: { cellWidth: 10, halign: 'center' }, 15: { cellWidth: 10, halign: 'center' }
+                0:  { cellWidth: 10, halign: 'center' },
+                1:  { cellWidth: 60 },                  // ← Más espacio para el nombre
+                2:  { cellWidth: 10, halign: 'center' },
+                3:  { cellWidth: 10, halign: 'center' },
+                4:  { cellWidth: 10, halign: 'center' },
+                5:  { cellWidth: 10, halign: 'center' },
+                6:  { cellWidth: 10, halign: 'center' },
+                7:  { cellWidth: 10, halign: 'center' },
+                8:  { cellWidth: 10, halign: 'center' },
+                9:  { cellWidth: 10, halign: 'center' },
+                10: { cellWidth: 10, halign: 'center' },
+                11: { cellWidth: 10, halign: 'center' },
+                12: { cellWidth: 10, halign: 'center' },
+                13: { cellWidth: 10, halign: 'center' },
+                14: { cellWidth: 10, halign: 'center' },
+                15: { cellWidth: 10, halign: 'center' }
             },
-            theme: 'grid' 
+            theme: 'grid'
         });
 
-        // Descargar el PDF
         const filename = `Hoja_Turnos_Maestro_1-146_${dateStr.replace(/\//g, '-')}.pdf`;
         doc.save(filename);
     });
 }
+
 
 // Cerrar resultados al clickear fuera
 document.addEventListener('click', (e) => {
