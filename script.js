@@ -255,18 +255,53 @@ const noSelectedMessage = document.getElementById('noSelectedMessage');
 const generatePDFBtn = document.getElementById('generatePDF');
 const btnAddNew = document.getElementById('btnAddNew');
 const btnLoadMaster = document.getElementById('btnLoadMaster');
-// NUEVA REFERENCIA DOM PARA EL SEGUNDO BOTÓN
-const generatePDF2Btn = document.getElementById('generatePDF2'); 
+const generatePDF2Btn = document.getElementById('generatePDF2');
 
-// 5. VARIABLES DE DATOS PARA PDF2 (Subconjunto del maestro 1 al 146 inclusive)
-// const productsForPDF2 = productsData.slice(0, 146);
+// 5. FUNCIÓN DE CLASIFICACIÓN PARA PDF2 (definida globalmente para reutilizar)
+const esTablet = new Set([
+    'ARCEDOL', 'NORGYLEN', 'NORGYL', 'ROSUVASTATINA', 'ISONIAZIDA', 'VITAMINA A'
+]);
+const esLiquido = new Set([
+    'LACTULOSA', 'LECHE MAGNESIA', 'SACARINA', 'VALPROATO LÍQUIDO', 'HIDROXICINA JBE',
+    'LORATADINA JBE', 'ELECTROLITOS', 'METICEL', 'DORZOLAMIDA', 'VISINA', 'TIMOLOL',
+    'OLOPATADINA', 'MUCILAGO', 'VIT D3 GTAS', 'VIT C GOTAS', 'HIERRO GOTAS',
+    'TRAMAL GOTAS', 'HALDOL GOTAS', 'EPAMIN LÍQUIDO', 'IBUPRUFENO LÍQUIDO',
+    'CLINDAMICINA AMP', 'PRESERVATIVOS', 'SULISOBENZONA', 'SHAMPOO DE BREA',
+    'ACEITE MINERAL TÓPICO', 'HIDRO LOCIÓN', 'PETROLATO LÍQUIDO PESADO', 'ATROVENT'
+]);
+const esCrema = new Set([
+    'EC26', 'PAY2', 'QUITACEL', 'ACYCLOVIR TÓPICO', 'DOMEBORO'
+]);
+const esInhalador = new Set([
+    'BECLO ORAL', 'BECONASE', 'SBT INH'
+]);
 
-// 6. FUNCIONES GLOBALES (Asignadas a window para que el HTML dinámico las encuentre)
+function clasificar(name) {
+    const prefix = name.split(' ')[0];
+    if (prefix === 'CN' || prefix === 'CJ' || prefix === 'TR') return 1;
+    if (prefix === 'TU') return 4;
+    if (prefix === 'AM' || prefix === 'FA' || prefix === 'FC' || prefix === 'UD') return 3;
+    if (esTablet.has(name))    return 1;
+    if (esInhalador.has(name)) return 2;
+    if (esLiquido.has(name))   return 3;
+    if (esCrema.has(name))     return 4;
+    return 5;
+}
+
+// 6. FUNCIÓN PARA LIMPIAR EL MAESTRO (sin duplicados, sin 'X')
+function getMasterListClean() {
+    const seen = new Set();
+    return masterListNames.filter(name => {
+        if (name === 'X' || seen.has(name)) return false;
+        seen.add(name);
+        return true;
+    });
+}
+
+// 7. FUNCIONES GLOBALES
 window.updateQuantity = function(codigo, field, value) {
     const product = selectedProducts.find(p => p.codigo === codigo);
-    if (product) {
-        product[field] = value;
-    }
+    if (product) product[field] = value;
 };
 
 window.removeProduct = function(codigo) {
@@ -311,8 +346,7 @@ function addProduct(product) {
     searchInput.value = '';
 }
 
-// 7. LISTADO MAESTRO COMPLETO (Usado solo para la búsqueda y "Cargar maestro")
-// (El PDF2 usa su propio subconjunto variable 'productsForPDF2')
+// 8. LISTADO MAESTRO
 const masterListNames = [
     "CN LEVODOPA 100 MG. Y CARBIDOPA AN", "CN LEVOMEPROMAZINA BASE 25 MG (CO", "CN FENITOINA SODICA 100 MG. DE ACCI",
     "CN METOCLOPRAMIDA BASE 10 MG. (CO", "CN DEXTROMETORFANO BROMOHIDRAT", "CN DIMENHIDRINATO 50 MG., TABLETAS",
@@ -369,16 +403,13 @@ const masterListNames = [
     "CN METFORMINA HIDROCLORURO 500 M"
 ];
 
-// 8. EVENTOS
+// 9. EVENTOS - CARGAR MAESTRO (usa lista limpia)
 if (btnLoadMaster) {
     btnLoadMaster.addEventListener('click', () => {
-        if (confirm("¿Deseas cargar los 150+ productos del listado maestro? Esto reemplazará lo que tengas en la tabla.")) {
-            // Limpiamos la tabla actual
+        if (confirm("¿Deseas cargar el listado maestro? Esto reemplazará lo que tengas en la tabla.")) {
             selectedProducts = [];
             selectedTableBody.innerHTML = '';
-            
-            // Recorremos el listado maestro y los agregamos
-            masterListNames.forEach((name, index) => {
+            getMasterListClean().forEach((name, index) => {
                 const prod = {
                     codigo: `MASTER-${index}`,
                     nombre: name,
@@ -393,6 +424,88 @@ if (btnLoadMaster) {
     });
 }
 
+// 10. EVENTO - AGREGAR NUEVO PRODUCTO
+if (btnAddNew) {
+    btnAddNew.addEventListener('click', () => {
+        // Crear overlay del modal
+        const overlay = document.createElement('div');
+        overlay.style.cssText = `
+            position:fixed; top:0; left:0; width:100%; height:100%;
+            background:rgba(0,0,0,0.5); z-index:1000;
+            display:flex; align-items:center; justify-content:center;
+        `;
+
+        // Crear modal
+        const modal = document.createElement('div');
+        modal.style.cssText = `
+            background:#fff; border-radius:8px; padding:24px;
+            width:90%; max-width:420px; box-shadow:0 4px 20px rgba(0,0,0,0.3);
+        `;
+        modal.innerHTML = `
+            <h3 style="margin:0 0 16px 0; color:#333;">Agregar Nuevo Producto</h3>
+            <label style="display:block; margin-bottom:6px; font-size:13px; color:#555;">Nombre del producto</label>
+            <input id="modalNombre" type="text" placeholder="Ej: CN NUEVO MEDICAMENTO 500 MG"
+                style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;
+                       font-size:14px; box-sizing:border-box; margin-bottom:12px;">
+            <label style="display:block; margin-bottom:6px; font-size:13px; color:#555;">Código (opcional)</label>
+            <input id="modalCodigo" type="text" placeholder="Ej: 1-10-00-0000"
+                style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;
+                       font-size:14px; box-sizing:border-box; margin-bottom:20px;">
+            <div style="display:flex; gap:10px; justify-content:flex-end;">
+                <button id="modalCancelar"
+                    style="padding:8px 16px; border:1px solid #ccc; border-radius:4px;
+                           background:#fff; cursor:pointer; font-size:14px;">Cancelar</button>
+                <button id="modalAgregar"
+                    style="padding:8px 16px; border:none; border-radius:4px;
+                           background:#4CAF50; color:#fff; cursor:pointer; font-size:14px;">Agregar</button>
+            </div>
+        `;
+
+        overlay.appendChild(modal);
+        document.body.appendChild(overlay);
+
+        const inputNombre = modal.querySelector('#modalNombre');
+        inputNombre.focus();
+
+        // Cancelar
+        modal.querySelector('#modalCancelar').addEventListener('click', () => {
+            document.body.removeChild(overlay);
+        });
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) document.body.removeChild(overlay);
+        });
+
+        // Agregar
+        modal.querySelector('#modalAgregar').addEventListener('click', () => {
+            const nombre = inputNombre.value.trim();
+            const codigo = modal.querySelector('#modalCodigo').value.trim()
+                           || `CUSTOM-${Date.now()}`;
+
+            if (!nombre) {
+                inputNombre.style.borderColor = 'red';
+                inputNombre.focus();
+                return;
+            }
+
+            // Agregar a productsData para que aparezca en búsquedas futuras
+            const yaExiste = productsData.some(p => p.nombre === nombre);
+            if (!yaExiste) {
+                productsData.push({ codigo, nombre });
+            }
+
+            // Agregar directamente a la tabla de seleccionados
+            addProduct({ codigo, nombre });
+            document.body.removeChild(overlay);
+        });
+
+        // Enter para confirmar
+        inputNombre.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') modal.querySelector('#modalAgregar').click();
+        });
+    });
+}
+
+// 11. EVENTO - BÚSQUEDA
 if (searchInput) {
     searchInput.addEventListener('input', (e) => {
         const searchTerm = e.target.value.toLowerCase().trim();
@@ -400,12 +513,10 @@ if (searchInput) {
             productResults.style.display = 'none';
             return;
         }
-
-        const filtered = productsData.filter(p => 
-            p.nombre.toLowerCase().includes(searchTerm) || 
+        const filtered = productsData.filter(p =>
+            p.nombre.toLowerCase().includes(searchTerm) ||
             p.codigo.includes(searchTerm)
         );
-
         productResults.innerHTML = '';
         if (filtered.length > 0) {
             filtered.forEach(p => {
@@ -422,15 +533,54 @@ if (searchInput) {
     });
 }
 
-// 9. GENERACIÓN DE PDF1 (Original - Lista con Cantidades)
-if (generatePDF2Btn) {
-    generatePDF2Btn.addEventListener('click', () => {
-        const doc = new jsPDF({
-            orientation: "p",
-            unit: "mm",
-            format: "letter"
+// 12. GENERACIÓN DE PDF1 - Lista de pedido con cantidades
+if (generatePDFBtn) {
+    generatePDFBtn.addEventListener('click', () => {
+        const doc = new jsPDF({ orientation: "p", unit: "mm", format: "a4" });
+        const now = new Date();
+        const dateStr = now.toLocaleDateString();
+        const timeStr = now.toLocaleTimeString();
+
+        doc.setFontSize(8);
+        doc.setTextColor(100);
+        doc.text(`Fecha: ${dateStr} - Hora: ${timeStr}`, 10, 8);
+        doc.text('Generado automáticamente por Selector de Productos', 200, 8, { align: 'right' });
+
+        doc.setFontSize(16);
+        doc.setTextColor(40);
+        doc.text("Pedido de Farmacia - Lista con Cantidades", 14, 20);
+
+        const rows = selectedProducts.map((p, i) => [
+            i + 1,
+            p.nombre,
+            p.solicitada || "",
+            p.recibida || ""
+        ]);
+
+        doc.autoTable({
+            startY: 28,
+            head: [['#', 'Nombre del Producto', 'Solicitado', 'Recibido']],
+            body: rows,
+            theme: 'grid',
+            headStyles: { fillColor: [66, 66, 66], textColor: 255, halign: 'center' },
+            styles: { fontSize: 9, cellPadding: 2, overflow: 'linebreak' },
+            columnStyles: {
+                0: { cellWidth: 10, halign: 'center' },
+                1: { cellWidth: 'auto' },
+                2: { cellWidth: 35, halign: 'center' },
+                3: { cellWidth: 35, halign: 'center' }
+            }
         });
 
+        const filename = `Pedido-Lista-${dateStr.replace(/\//g, '-')}.pdf`;
+        doc.save(filename);
+    });
+}
+
+// 13. GENERACIÓN DE PDF2 - Hoja de turnos maestro
+if (generatePDF2Btn) {
+    generatePDF2Btn.addEventListener('click', () => {
+        const doc = new jsPDF({ orientation: "p", unit: "mm", format: "letter" });
         const now = new Date();
         const dateStr = now.toLocaleDateString();
         const timeStr = now.toLocaleTimeString();
@@ -446,46 +596,7 @@ if (generatePDF2Btn) {
 
         const headers = [['#', 'Nombre del Producto', 'L-A', 'L-B', 'K-A', 'K-B', 'M-A', 'M-B', 'J-A', 'J-B', 'V-A', 'V-B', 'S-A', 'S-B', 'D-A', 'D-B']];
 
-        // Clasificación de nombres comerciales sin prefijo estándar
-        const esTablet = new Set([
-            'ARCEDOL', 'NORGYLEN', 'NORGYL', 'ROSUVASTATINA', 'ISONIAZIDA', 'VITAMINA A'
-        ]);
-        const esLiquido = new Set([
-            'LACTULOSA', 'LECHE MAGNESIA', 'SACARINA', 'VALPROATO LÍQUIDO', 'HIDROXICINA JBE',
-            'LORATADINA JBE', 'ELECTROLITOS', 'METICEL', 'DORZOLAMIDA', 'VISINA', 'TIMOLOL',
-            'OLOPATADINA', 'MUCILAGO', 'VIT D3 GTAS', 'VIT C GOTAS', 'HIERRO GOTAS',
-            'TRAMAL GOTAS', 'HALDOL GOTAS', 'EPAMIN LÍQUIDO', 'IBUPRUFENO LÍQUIDO',
-            'CLINDAMICINA AMP', 'PRESERVATIVOS', 'SULISOBENZONA', 'SHAMPOO DE BREA',
-            'ACEITE MINERAL TÓPICO', 'HIDRO LOCIÓN', 'PETROLATO LÍQUIDO PESADO', 'ATROVENT'
-        ]);
-        const esCrema = new Set([
-            'EC26', 'PAY2', 'QUITACEL', 'ACYCLOVIR TÓPICO', 'DOMEBORO'
-        ]);
-        const esInhalador = new Set([
-            'BECLO ORAL', 'BECONASE', 'SBT INH'
-        ]);
-
-        function clasificar(name) {
-            const prefix = name.split(' ')[0];
-            if (prefix === 'CN' || prefix === 'CJ' || prefix === 'TR') return 1; // tabletas
-            if (prefix === 'TU') return 4;                                        // cremas
-            if (prefix === 'AM' || prefix === 'FA' || prefix === 'FC' || prefix === 'UD') return 3; // liquidos
-            if (esTablet.has(name))    return 1;
-            if (esInhalador.has(name)) return 2;
-            if (esLiquido.has(name))   return 3;
-            if (esCrema.has(name))     return 4;
-            return 5; // fallback al final
-        }
-
-        // Limpiar: sin 'X', sin duplicados, respetando primera aparición
-        const seen = new Set();
-        const cleaned = masterListNames.filter(name => {
-            if (name === 'X' || seen.has(name)) return false;
-            seen.add(name);
-            return true;
-        });
-
-        // Ordenar por grupo conservando orden original dentro de cada grupo
+        const cleaned = getMasterListClean();
         const sorted = [...cleaned].sort((a, b) => clasificar(a) - clasificar(b));
 
         const data = sorted.map((name, index) => [
@@ -540,13 +651,12 @@ if (generatePDF2Btn) {
     });
 }
 
-
-// Cerrar resultados al clickear fuera
+// 14. CERRAR RESULTADOS AL CLICKEAR FUERA
 document.addEventListener('click', (e) => {
     if (productResults && !e.target.closest('.search-container')) {
         productResults.style.display = 'none';
     }
 });
 
-// Inicialización de la tabla
+// 15. INICIALIZACIÓN
 updateTableState();
