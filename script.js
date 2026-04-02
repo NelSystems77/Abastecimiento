@@ -437,7 +437,7 @@ if (generatePDF2Btn) {
 
         doc.setFontSize(9);
         doc.setTextColor(100);
-        doc.text(`Fecha: ${dateStr} - Hora: ${timeStr}`, 5, 8); 
+        doc.text(`Fecha: ${dateStr} - Hora: ${timeStr}`, 5, 8);
         doc.text('Hoja para abastecer despacho', 211, 8, { align: 'right' });
 
         doc.setFontSize(16);
@@ -446,10 +446,51 @@ if (generatePDF2Btn) {
 
         const headers = [['#', 'Nombre del Producto', 'L-A', 'L-B', 'K-A', 'K-B', 'M-A', 'M-B', 'J-A', 'J-B', 'V-A', 'V-B', 'S-A', 'S-B', 'D-A', 'D-B']];
 
-        const namesForPDF2 = masterListNames.slice(0, 146);
-        const data = namesForPDF2.map((name, index) => [
+        // Clasificación de nombres comerciales sin prefijo estándar
+        const esTablet = new Set([
+            'ARCEDOL', 'NORGYLEN', 'NORGYL', 'ROSUVASTATINA', 'ISONIAZIDA', 'VITAMINA A'
+        ]);
+        const esLiquido = new Set([
+            'LACTULOSA', 'LECHE MAGNESIA', 'SACARINA', 'VALPROATO LÍQUIDO', 'HIDROXICINA JBE',
+            'LORATADINA JBE', 'ELECTROLITOS', 'METICEL', 'DORZOLAMIDA', 'VISINA', 'TIMOLOL',
+            'OLOPATADINA', 'MUCILAGO', 'VIT D3 GTAS', 'VIT C GOTAS', 'HIERRO GOTAS',
+            'TRAMAL GOTAS', 'HALDOL GOTAS', 'EPAMIN LÍQUIDO', 'IBUPRUFENO LÍQUIDO',
+            'CLINDAMICINA AMP', 'PRESERVATIVOS', 'SULISOBENZONA', 'SHAMPOO DE BREA',
+            'ACEITE MINERAL TÓPICO', 'HIDRO LOCIÓN', 'PETROLATO LÍQUIDO PESADO', 'ATROVENT'
+        ]);
+        const esCrema = new Set([
+            'EC26', 'PAY2', 'QUITACEL', 'ACYCLOVIR TÓPICO', 'DOMEBORO'
+        ]);
+        const esInhalador = new Set([
+            'BECLO ORAL', 'BECONASE', 'SBT INH'
+        ]);
+
+        function clasificar(name) {
+            const prefix = name.split(' ')[0];
+            if (prefix === 'CN' || prefix === 'CJ' || prefix === 'TR') return 1; // tabletas
+            if (prefix === 'TU') return 4;                                        // cremas
+            if (prefix === 'AM' || prefix === 'FA' || prefix === 'FC' || prefix === 'UD') return 3; // liquidos
+            if (esTablet.has(name))    return 1;
+            if (esInhalador.has(name)) return 2;
+            if (esLiquido.has(name))   return 3;
+            if (esCrema.has(name))     return 4;
+            return 5; // fallback al final
+        }
+
+        // Limpiar: sin 'X', sin duplicados, respetando primera aparición
+        const seen = new Set();
+        const cleaned = masterListNames.filter(name => {
+            if (name === 'X' || seen.has(name)) return false;
+            seen.add(name);
+            return true;
+        });
+
+        // Ordenar por grupo conservando orden original dentro de cada grupo
+        const sorted = [...cleaned].sort((a, b) => clasificar(a) - clasificar(b));
+
+        const data = sorted.map((name, index) => [
             index + 1,
-            name.length > 32 ? name.substring(0, 32) + '…' : name,  // ← truncar a 32 chars
+            name.length > 32 ? name.substring(0, 32) + '…' : name,
             '', '', '', '', '', '', '', '', '', '', '', '', '', ''
         ]);
 
@@ -459,8 +500,8 @@ if (generatePDF2Btn) {
             startY: 24,
             margin: { top: 15, bottom: 10, left: 4, right: 4 },
             styles: {
-                fontSize: 10,         // ← Letra grande y legible
-                cellPadding: 1.5,       // ← Padding cómodo para escribir a mano
+                fontSize: 10,
+                cellPadding: 1.5,
                 overflow: 'ellipsize',
                 lineColor: [40, 40, 40],
                 lineWidth: 0.4
@@ -474,27 +515,27 @@ if (generatePDF2Btn) {
                 cellPadding: 1
             },
             columnStyles: {
-                0:  { cellWidth: 7, halign: 'center' },
-                1:  { cellWidth: 58 },                  // espacio para el nombre
-                2:  { cellWidth: 9, halign: 'center' },
-                3:  { cellWidth: 9, halign: 'center' },
-                4:  { cellWidth: 9, halign: 'center' },
-                5:  { cellWidth: 9, halign: 'center' },
-                6:  { cellWidth: 9, halign: 'center' },
-                7:  { cellWidth: 9, halign: 'center' },
-                8:  { cellWidth: 9, halign: 'center' },
-                9:  { cellWidth: 9, halign: 'center' },
-                10: { cellWidth: 9, halign: 'center' },
-                11: { cellWidth: 9, halign: 'center' },
-                12: { cellWidth: 9, halign: 'center' },
-                13: { cellWidth: 9, halign: 'center' },
-                14: { cellWidth: 9, halign: 'center' },
-                15: { cellWidth: 9, halign: 'center' }
+                0:  { cellWidth: 7,  halign: 'center' },
+                1:  { cellWidth: 58 },
+                2:  { cellWidth: 9,  halign: 'center' },
+                3:  { cellWidth: 9,  halign: 'center' },
+                4:  { cellWidth: 9,  halign: 'center' },
+                5:  { cellWidth: 9,  halign: 'center' },
+                6:  { cellWidth: 9,  halign: 'center' },
+                7:  { cellWidth: 9,  halign: 'center' },
+                8:  { cellWidth: 9,  halign: 'center' },
+                9:  { cellWidth: 9,  halign: 'center' },
+                10: { cellWidth: 9,  halign: 'center' },
+                11: { cellWidth: 9,  halign: 'center' },
+                12: { cellWidth: 9,  halign: 'center' },
+                13: { cellWidth: 9,  halign: 'center' },
+                14: { cellWidth: 9,  halign: 'center' },
+                15: { cellWidth: 9,  halign: 'center' }
             },
             theme: 'grid'
         });
 
-        const filename = `Hoja_Turnos_Maestro_1-146_${dateStr.replace(/\//g, '-')}.pdf`;
+        const filename = `Hoja_Turnos_Maestro_${dateStr.replace(/\//g, '-')}.pdf`;
         doc.save(filename);
     });
 }
