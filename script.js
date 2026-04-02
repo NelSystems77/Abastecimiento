@@ -616,6 +616,8 @@ if (generatePDF2Btn) {
                 overflow: 'ellipsize',
                 lineColor: [40, 40, 40],
                 lineWidth: 0.4
+                textColor: [0, 0, 0]
+        
             },
             headStyles: {
                 fillColor: [66, 66, 66],
