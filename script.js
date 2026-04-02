@@ -459,36 +459,36 @@ if (generatePDF2Btn) {
             startY: 24,
             margin: { top: 15, bottom: 10, left: 5, right: 5 },
             styles: {
-                fontSize: 11,         // ← Letra grande y legible
+                fontSize: 10,         // ← Letra grande y legible
                 cellPadding: 2,       // ← Padding cómodo para escribir a mano
                 overflow: 'linebreak',
                 lineColor: [40, 40, 40],
-                lineWidth: 0.5
+                lineWidth: 0.4
             },
             headStyles: {
                 fillColor: [66, 66, 66],
                 textColor: 255,
                 fontStyle: 'bold',
                 halign: 'center',
-                fontSize: 10
+                fontSize: 8
             },
             columnStyles: {
-                0:  { cellWidth: 10, halign: 'center' },
-                1:  { cellWidth: 60 },                  // ← Más espacio para el nombre
-                2:  { cellWidth: 10, halign: 'center' },
-                3:  { cellWidth: 10, halign: 'center' },
-                4:  { cellWidth: 10, halign: 'center' },
-                5:  { cellWidth: 10, halign: 'center' },
-                6:  { cellWidth: 10, halign: 'center' },
-                7:  { cellWidth: 10, halign: 'center' },
-                8:  { cellWidth: 10, halign: 'center' },
-                9:  { cellWidth: 10, halign: 'center' },
-                10: { cellWidth: 10, halign: 'center' },
-                11: { cellWidth: 10, halign: 'center' },
-                12: { cellWidth: 10, halign: 'center' },
-                13: { cellWidth: 10, halign: 'center' },
-                14: { cellWidth: 10, halign: 'center' },
-                15: { cellWidth: 10, halign: 'center' }
+                0:  { cellWidth: 8, halign: 'center' },
+                1:  { cellWidth: 65 },                  // ← Más espacio para el nombre
+                2:  { cellWidth: 8, halign: 'center' },
+                3:  { cellWidth: 8, halign: 'center' },
+                4:  { cellWidth: 8, halign: 'center' },
+                5:  { cellWidth: 8, halign: 'center' },
+                6:  { cellWidth: 8, halign: 'center' },
+                7:  { cellWidth: 8, halign: 'center' },
+                8:  { cellWidth: 8, halign: 'center' },
+                9:  { cellWidth: 8, halign: 'center' },
+                10: { cellWidth: 8, halign: 'center' },
+                11: { cellWidth: 8, halign: 'center' },
+                12: { cellWidth: 8, halign: 'center' },
+                13: { cellWidth: 8, halign: 'center' },
+                14: { cellWidth: 8, halign: 'center' },
+                15: { cellWidth: 8, halign: 'center' }
             },
             theme: 'grid'
         });
