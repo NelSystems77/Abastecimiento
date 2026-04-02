@@ -449,7 +449,7 @@ if (generatePDF2Btn) {
         const namesForPDF2 = masterListNames.slice(0, 146);
         const data = namesForPDF2.map((name, index) => [
             index + 1,
-            name,
+            name.length > 32 ? name.substring(0, 32) + '…' : name,  // ← truncar a 32 chars
             '', '', '', '', '', '', '', '', '', '', '', '', '', ''
         ]);
 
@@ -457,11 +457,11 @@ if (generatePDF2Btn) {
             head: headers,
             body: data,
             startY: 24,
-            margin: { top: 15, bottom: 10, left: 5, right: 5 },
+            margin: { top: 15, bottom: 10, left: 4, right: 4 },
             styles: {
                 fontSize: 10,         // ← Letra grande y legible
-                cellPadding: 2,       // ← Padding cómodo para escribir a mano
-                overflow: 'linebreak',
+                cellPadding: 1.5,       // ← Padding cómodo para escribir a mano
+                overflow: 'ellipsize',
                 lineColor: [40, 40, 40],
                 lineWidth: 0.4
             },
@@ -470,7 +470,8 @@ if (generatePDF2Btn) {
                 textColor: 255,
                 fontStyle: 'bold',
                 halign: 'center',
-                fontSize: 8
+                fontSize: 8,
+                cellPadding: 1
             },
             columnStyles: {
                 0:  { cellWidth: 7, halign: 'center' },
