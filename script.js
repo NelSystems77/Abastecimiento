@@ -473,22 +473,22 @@ if (generatePDF2Btn) {
                 fontSize: 8
             },
             columnStyles: {
-                0:  { cellWidth: 8, halign: 'center' },
-                1:  { cellWidth: 65 },                  // ← Más espacio para el nombre
-                2:  { cellWidth: 8, halign: 'center' },
-                3:  { cellWidth: 8, halign: 'center' },
-                4:  { cellWidth: 8, halign: 'center' },
-                5:  { cellWidth: 8, halign: 'center' },
-                6:  { cellWidth: 8, halign: 'center' },
-                7:  { cellWidth: 8, halign: 'center' },
-                8:  { cellWidth: 8, halign: 'center' },
-                9:  { cellWidth: 8, halign: 'center' },
-                10: { cellWidth: 8, halign: 'center' },
-                11: { cellWidth: 8, halign: 'center' },
-                12: { cellWidth: 8, halign: 'center' },
-                13: { cellWidth: 8, halign: 'center' },
-                14: { cellWidth: 8, halign: 'center' },
-                15: { cellWidth: 8, halign: 'center' }
+                0:  { cellWidth: 7, halign: 'center' },
+                1:  { cellWidth: 58 },                  // espacio para el nombre
+                2:  { cellWidth: 9, halign: 'center' },
+                3:  { cellWidth: 9, halign: 'center' },
+                4:  { cellWidth: 9, halign: 'center' },
+                5:  { cellWidth: 9, halign: 'center' },
+                6:  { cellWidth: 9, halign: 'center' },
+                7:  { cellWidth: 9, halign: 'center' },
+                8:  { cellWidth: 9, halign: 'center' },
+                9:  { cellWidth: 9, halign: 'center' },
+                10: { cellWidth: 9, halign: 'center' },
+                11: { cellWidth: 9, halign: 'center' },
+                12: { cellWidth: 9, halign: 'center' },
+                13: { cellWidth: 9, halign: 'center' },
+                14: { cellWidth: 9, halign: 'center' },
+                15: { cellWidth: 9, halign: 'center' }
             },
             theme: 'grid'
         });
