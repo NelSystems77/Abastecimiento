@@ -628,8 +628,8 @@ if (generatePDF2Btn) {
                 cellPadding: 1
             },
             columnStyles: {
-                0:  { cellWidth: 7,  halign: 'center' },
-                1:  { cellWidth: 58 },
+                0:  { cellWidth: 10,  halign: 'center' },
+                1:  { cellWidth: 55 },
                 2:  { cellWidth: 9,  halign: 'center' },
                 3:  { cellWidth: 9,  halign: 'center' },
                 4:  { cellWidth: 9,  halign: 'center' },
