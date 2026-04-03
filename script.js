@@ -588,7 +588,7 @@ if (generatePDF2Btn) {
         doc.setFontSize(9);
         doc.setTextColor(100);
         doc.text(`Fecha: ${dateStr} - Hora: ${timeStr}`, 5, 8);
-        doc.text('Hoja para abastecer despacho', 211, 8, { align: 'right' });
+        doc.text('Abastecimiento semanal 772', 211, 8, { align: 'right' });
 
         doc.setFontSize(16);
         doc.setTextColor(40);
@@ -648,7 +648,7 @@ if (generatePDF2Btn) {
             theme: 'grid'
         });
 
-        const filename = `Hoja_Turnos_Maestro_${dateStr.replace(/\//g, '-')}.pdf`;
+        const filename = `Machote_Stock_772_${dateStr.replace(/\//g, '-')}.pdf`;
         doc.save(filename);
     });
 }
