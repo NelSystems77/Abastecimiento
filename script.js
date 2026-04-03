@@ -615,7 +615,7 @@ if (generatePDF2Btn) {
                 cellPadding: 1.5,
                 overflow: 'ellipsize',
                 lineColor: [40, 40, 40],
-                lineWidth: 0.4
+                lineWidth: 0.4,
                 textColor: [0, 0, 0]
         
             },
